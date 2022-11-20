@@ -796,6 +796,7 @@ func transactionFromParsedXDR(xdrEnv xdr.TransactionEnvelope) (*GenericTransacti
 type TransactionParams struct {
 	SourceAccount        Account
 	IncrementSequenceNum bool
+	SequenceNum          int64
 	Operations           []Operation
 	BaseFee              int64
 	Memo                 Memo
@@ -810,7 +811,9 @@ func NewTransaction(params TransactionParams) (*Transaction, error) {
 
 	var sequence int64
 	var err error
-	if params.IncrementSequenceNum {
+	if params.SequenceNum > 0 {
+		sequence = params.SequenceNum
+	} else if params.IncrementSequenceNum {
 		sequence, err = params.SourceAccount.IncrementSequenceNumber()
 	} else {
 		sequence, err = params.SourceAccount.GetSequenceNumber()
